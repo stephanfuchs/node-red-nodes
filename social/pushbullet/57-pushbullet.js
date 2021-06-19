@@ -6,7 +6,6 @@ module.exports = function(RED) {
     var when = require('when');
     var atob = require('atob');
     var forge = require('node-forge');
-    var _ = require('lodash');
     var EventEmitter = require('events').EventEmitter;
 
     function onError(err, node) {
@@ -97,15 +96,8 @@ module.exports = function(RED) {
     }
 
     // From https://docs.pushbullet.com/#decryption
-  PushbulletConfig.prototype.decryptMessage = function(messagePayload) {
-      var self = this;
+    PushbulletConfig.prototype.decryptMessage = function(messageContent) {
       var encryptionKey = this.credentials.encryptionKey;
-      var messagePayloadJson = JSON.parse(messagePayload.utf8Data);
-      var messageContent = _.get(messagePayloadJson, 'push.ciphertext');
-
-      if (messageContent === undefined) {
-        return messageContent;
-      }
       var encoded_message = atob(messageContent);
       var version = encoded_message.substr(0, 1);
       var tag = encoded_message.substr(1, 16); // 128 bits
@@ -136,12 +128,8 @@ module.exports = function(RED) {
             var closing = false;
             var tout;
             stream.on('message', function(res) {
-              self.log('123message', res);
                 if (res.type === 'tickle') {
                     self.handleTickle(res);
-                }
-                else if (res.encrypted) {
-                  self.pushMsg(self.decryptMessage(res));
                 }
                 else if (res.type === 'push') {
                     self.pushMsg(res.push);
@@ -206,10 +194,16 @@ module.exports = function(RED) {
         }
     };
 
-    PushbulletConfig.prototype.pushMsg = function(incoming) {
+    PushbulletConfig.prototype.pushMsg = function(raw_incoming) {
         if (this._inputNodes.length === 0) {
             return;
         }
+
+        self.warn(raw_incoming);
+
+        var incoming = incoming.encrypted ? this.decryptMessage(raw_incoming.ciphertext) : raw_incoming;
+
+        self.warn(incoming);
 
         var msg = {
             pushtype: incoming.type,
