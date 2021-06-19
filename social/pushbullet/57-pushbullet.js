@@ -40,13 +40,12 @@ module.exports = function(RED) {
         this.initialised = true;
         var self = this;
         var apikey = this.credentials.apikey;
-        var rawMe;
 
         if (apikey) {
             try {
                 var pusher = new PushBullet(apikey);
                 // get 'me' info
-                rawMe = when.promise(function(resolve, reject) {
+                this.me = when.promise(function(resolve, reject) {
                     pusher.me(function(err, me) {
                         if (err) {
                             reject(err);
@@ -75,7 +74,6 @@ module.exports = function(RED) {
                         }
                     });
                 });
-                this.me = rawMe._handler.handler.value;
                 this.pusher = pusher;
             }
             catch(err) {
@@ -99,7 +97,7 @@ module.exports = function(RED) {
         var self = this;
         if (this.pusher) {
             if (this.credentials.encryptionPassword) {
-              this.pusher.enableEncryption(this.credentials.encryptionPassword, 'ujB8nxmW2ZU');
+              this.pusher.enableEncryption(this.credentials.encryptionPassword, this.me._handler.handler.value.iden);
             }
             var stream = this.pusher.stream();
             stream.setMaxListeners(100);
@@ -172,8 +170,6 @@ module.exports = function(RED) {
     };
 
     PushbulletConfig.prototype.pushMsg = function(incoming) {
-        this.warn('me')
-        this.warn(this.iden)
         if (this._inputNodes.length === 0) {
             return;
         }
