@@ -170,6 +170,8 @@ module.exports = function(RED) {
     };
 
     PushbulletConfig.prototype.pushMsg = function(incoming) {
+        this.warn('incoming')
+        this.warn(incoming)
         if (this._inputNodes.length === 0) {
             return;
         }
