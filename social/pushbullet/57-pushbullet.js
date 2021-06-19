@@ -97,11 +97,10 @@ module.exports = function(RED) {
     }
 
     // From https://docs.pushbullet.com/#decryption
-    PushbulletConfig.prototype.decryptMessage = function(messagePayloadUtf8Data) {
-      this.status(messagePayloadUtf8Data);
+  PushbulletConfig.prototype.decryptMessage = function(messagePayload) {
       var self = this;
       var encryptionKey = this.credentials.encryptionKey;
-      var messagePayloadJson = JSON.parse(messagePayloadUtf8Data);
+      var messagePayloadJson = JSON.parse(messagePayload.utf8Data);
       var messageContent = _.get(messagePayloadJson, 'push.ciphertext');
 
       if (messageContent === undefined) {
@@ -144,7 +143,7 @@ module.exports = function(RED) {
                     self.pushMsg(res.push);
                 }
                 else if (res.type === 'utf8') {
-                  self.pushMsg(self.decryptMessage(res.utf8Data));
+                  self.pushMsg(self.decryptMessage(res.push));
                 }
             });
             stream.on('connect', function() {
