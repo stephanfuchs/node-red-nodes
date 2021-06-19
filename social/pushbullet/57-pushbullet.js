@@ -204,7 +204,8 @@ module.exports = function(RED) {
         });
 
         this.warn('after forge.cipher.createDecipher')
-
+        // this.warn('decipher');
+        // this.warn(decipher);
         // decipher.update(forge.util.createBuffer(encrypted_message));
         // decipher.finish();
 

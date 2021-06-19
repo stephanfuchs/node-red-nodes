@@ -1,6 +1,6 @@
 {
     "name"          : "node-red-node-pushbullet",
-    "version"       : "0.0.29",
+    "version"       : "0.0.33",
     "description"   : "A Node-RED node to send alerts via Pushbullet",
     "dependencies"  : {
         "atob": "^2.1.2",
