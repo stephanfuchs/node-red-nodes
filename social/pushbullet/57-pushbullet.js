@@ -96,12 +96,9 @@ module.exports = function(RED) {
     PushbulletConfig.prototype.setupStream = function() {
         var self = this;
         if (this.pusher) {
-            self.warn('Debug');
-            self.warn(self.credentials.encryptionPassword);
-            // self.warn(me);
-            // self.warn(self.me);
-            // self.warn(me.iden);
-            // self.warn(self.me.iden);
+            if (this.credentials.encryptionPassword) {
+              this.pusher.enableEncryption(this.credentials.encryptionPassword, this.me.iden);
+            }
             var stream = this.pusher.stream();
             stream.setMaxListeners(100);
             var closing = false;
