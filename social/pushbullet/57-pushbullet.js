@@ -97,7 +97,7 @@ module.exports = function(RED) {
         var self = this;
         if (this.pusher) {
             if (this.credentials.encryptionPassword) {
-              this.pusher.enableEncryption(this.credentials.encryptionPassword, this.me.iden);
+              this.pusher.enableEncryption(this.credentials.encryptionPassword, 'ujB8nxmW2ZU');
             }
             var stream = this.pusher.stream();
             stream.setMaxListeners(100);
