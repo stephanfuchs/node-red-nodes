@@ -4,6 +4,9 @@ module.exports = function(RED) {
     var PushBullet = require('pushbullet');
     var fs = require('fs');
     var when = require('when');
+    var atob = require('atob');
+    var forge = require('node-forge');
+    var _ = require('lodash');
     var EventEmitter = require('events').EventEmitter;
 
     function onError(err, node) {
@@ -27,9 +30,40 @@ module.exports = function(RED) {
         this.initialised = false;
     }
 
+    // From https://docs.pushbullet.com/#decryption
+    function decryptMessage(messagePayloadUtf8Data) {
+      var messagePayloadJson = JSON.parse(messagePayloadUtf8Data);
+      var messageContent = _.get(messagePayloadJson, 'push.ciphertext');
+
+      if (messageContent === undefined) {
+        return messageContent;
+      }
+      var encoded_message = atob(messageContent);
+      var version = encoded_message.substr(0, 1);
+      var tag = encoded_message.substr(1, 16); // 128 bits
+      var initialization_vector = encoded_message.substr(17, 12); // 96 bits
+      var encrypted_message = encoded_message.substr(29);
+
+      if (version != "1") {
+        throw "invalid version"
+      }
+
+      var decipher = forge.cipher.createDecipher('AES-GCM', pushbulletEncryptionKey);
+      decipher.start({
+        'iv': initialization_vector,
+        'tag': tag
+      });
+      decipher.update(forge.util.createBuffer(encrypted_message));
+      decipher.finish();
+
+      var message = decipher.output.toString('utf8');
+      return JSON.parse(message);
+    }
+
     RED.nodes.registerType("pushbullet-config", PushbulletConfig, {
         credentials: {
-            apikey: {type: "password"}
+            apikey: {type: "password"},
+            encryptionKey: { type: "password" }
         }
     });
 
@@ -105,6 +139,9 @@ module.exports = function(RED) {
                 }
                 else if (res.type === 'push') {
                     self.pushMsg(res.push);
+                }
+                else if (res.type === 'utf8') {
+                  self.pushMsg(decryptMessage(res.utf8Data));
                 }
             });
             stream.on('connect', function() {
