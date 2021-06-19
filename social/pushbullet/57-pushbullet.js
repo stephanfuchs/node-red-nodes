@@ -201,10 +201,10 @@ module.exports = function(RED) {
         decipher.update(forge.util.createBuffer(messagePayload));
         decipher.finish();
 
-        // var message = decipher.output.toString('utf8');
-        this.warn('decipher');
-        this.warn(decipher);
-        // return JSON.parse(message);
+        var message = decipher.output.toString('utf8');
+        this.warn('message');
+        this.warn(message);
+        return JSON.parse(message);
     }
 
     PushbulletConfig.prototype.pushMsg = function(incoming) {
