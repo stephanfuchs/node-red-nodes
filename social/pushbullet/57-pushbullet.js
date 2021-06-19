@@ -4,8 +4,6 @@ module.exports = function(RED) {
     var PushBullet = require('pushbullet');
     var fs = require('fs');
     var when = require('when');
-    var atob = require('atob');
-    var forge = require('node-forge');
     var EventEmitter = require('events').EventEmitter;
 
     function onError(err, node) {
@@ -32,7 +30,7 @@ module.exports = function(RED) {
     RED.nodes.registerType("pushbullet-config", PushbulletConfig, {
         credentials: {
             apikey: {type: "password"},
-            encryptionKey: { type: "password" }
+            encryptionPassword: { type: "password" }
         }
     });
 
@@ -98,6 +96,9 @@ module.exports = function(RED) {
     PushbulletConfig.prototype.setupStream = function() {
         var self = this;
         if (this.pusher) {
+            if (this.credentials.encryptionPassword) {
+              pusher.enableEncryption(this.credentials.encryptionPassword, me.iden);
+            }
             var stream = this.pusher.stream();
             stream.setMaxListeners(100);
             var closing = false;
@@ -169,62 +170,10 @@ module.exports = function(RED) {
         }
     };
 
-    // From https://docs.pushbullet.com/#decryption
-    PushbulletConfig.prototype.decryptMessage = function(messagePayloadInput) {
-        var encryptionKey = atob(this.credentials.encryptionKey);
-        var messagePayload = atob(messagePayloadInput);
-
-        var version = messagePayload.substr(0, 1);
-        var tag = messagePayload.substr(1, 16); // 128 bits
-        var initialization_vector = messagePayload.substr(17, 12); // 96 bits
-        var encrypted_message = messagePayload.substr(29);
-
-        // this.warn('after vars');
-        // this.warn('version');
-        // this.warn(version);
-
-        if (version != "1") {
-            this.error("invalid version");
-        }
-
-        // this.warn('forge.cipher.createDecipher')
-
-        var decipher = forge.cipher.createDecipher('AES-GCM', encryptionKey);
-        decipher.start({
-          'iv': initialization_vector,
-          'tag': tag
-        });
-
-        // this.warn('after forge.cipher.createDecipher')
-        // this.warn('decipher');
-        // this.warn(decipher);
-        decipher.update(forge.util.createBuffer(messagePayload));
-        decipher.finish();
-
-        var message = decipher.output.toString('utf8');
-        this.warn('message');
-        this.warn(message);
-        return JSON.parse(message);
-    }
-
     PushbulletConfig.prototype.pushMsg = function(incoming) {
         if (this._inputNodes.length === 0) {
             return;
         }
-
-        var self = this;
-
-        try {
-            var oincoming =
-                incoming.encrypted ? this.decryptMessage(incoming.ciphertext) : incoming;
-        }
-        catch (e) {
-            self.warn('decrypt error');
-            self.warn(e);
-        }
-
-        // this.warn('oincoming');
-        // this.warn(oincoming);
 
         var msg = {
             pushtype: incoming.type,
