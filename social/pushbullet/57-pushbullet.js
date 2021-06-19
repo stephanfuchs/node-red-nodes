@@ -136,15 +136,17 @@ module.exports = function(RED) {
             var closing = false;
             var tout;
             stream.on('message', function(res) {
+              self.log('123message', res);
                 if (res.type === 'tickle') {
                     self.handleTickle(res);
+                }
+                else if (res.encrypted) {
+                  self.pushMsg(self.decryptMessage(res));
                 }
                 else if (res.type === 'push') {
                     self.pushMsg(res.push);
                 }
-                else if (res.type === 'utf8') {
-                  self.pushMsg(self.decryptMessage(res.push));
-                }
+
             });
             stream.on('connect', function() {
                 self.emitter.emit('stream_connected');
