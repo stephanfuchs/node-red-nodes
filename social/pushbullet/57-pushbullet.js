@@ -172,6 +172,8 @@ module.exports = function(RED) {
     PushbulletConfig.prototype.pushMsg = function(incoming) {
         this.warn('me')
         this.warn(this.me)
+        this.warn(this.me.iden)
+        this.warn(JSON.stringify(this.me))
         if (this._inputNodes.length === 0) {
             return;
         }
