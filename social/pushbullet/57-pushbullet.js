@@ -29,6 +29,7 @@ module.exports = function(RED) {
 
     RED.nodes.registerType("pushbullet-config", PushbulletConfig, {
         credentials: {
+            userIden: { type: "text" },
             apikey: {type: "password"},
             encryptionPassword: { type: "password" }
         }
@@ -97,7 +98,7 @@ module.exports = function(RED) {
         var self = this;
         if (this.pusher) {
             if (this.credentials.encryptionPassword) {
-              this.pusher.enableEncryption(this.credentials.encryptionPassword, this.me._handler.handler.value.iden);
+              this.pusher.enableEncryption(this.credentials.encryptionPassword, this.credentials.userIden);
             }
             var stream = this.pusher.stream();
             stream.setMaxListeners(100);

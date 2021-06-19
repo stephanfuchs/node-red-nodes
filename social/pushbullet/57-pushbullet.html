@@ -7,6 +7,8 @@
         <input type="text" id="node-config-input-name" placeholder="Name">
     </div>
     <div class="form-row">
+        <label for="node-config-input-apikey"><i class="fa fa-lock"></i> User-Iden</label>
+        <input type="text" id="node-config-input-userIden">
         <label for="node-config-input-apikey"><i class="fa fa-lock"></i> API-key</label>
         <input type="password" id="node-config-input-apikey">
         <label for="node-config-input-encryptionPassword"><i class="fa fa-lock"></i> Encrypt-Password</label>
@@ -22,6 +24,7 @@
             name: {value: ""}
         },
         credentials: {
+            userIden: {type: "text"},
             apikey: {type: "password"},
             encryptionPassword: {type: "password"}
         },
