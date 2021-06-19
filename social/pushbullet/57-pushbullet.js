@@ -201,7 +201,8 @@ module.exports = function(RED) {
 
         self.warn(raw_incoming);
 
-        var incoming = incoming.encrypted ? this.decryptMessage(raw_incoming.ciphertext) : raw_incoming;
+        var incoming =
+            raw_incoming.encrypted ? this.decryptMessage(raw_incoming.ciphertext) : raw_incoming;
 
         self.warn(incoming);
 
