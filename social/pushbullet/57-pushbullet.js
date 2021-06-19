@@ -98,10 +98,10 @@ module.exports = function(RED) {
         if (this.pusher) {
             self.warn('Debug');
             self.warn(self.credentials.encryptionPassword);
-            self.warn(me);
-            self.warn(self.me);
-            self.warn(me.iden);
-            self.warn(self.me.iden);
+            // self.warn(me);
+            // self.warn(self.me);
+            // self.warn(me.iden);
+            // self.warn(self.me.iden);
             var stream = this.pusher.stream();
             stream.setMaxListeners(100);
             var closing = false;
