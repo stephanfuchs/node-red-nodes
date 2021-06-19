@@ -171,7 +171,7 @@ module.exports = function(RED) {
 
     // From https://docs.pushbullet.com/#decryption
     PushbulletConfig.prototype.decryptMessage = function(messagePayloadInput) {
-        var encryptionKey = this.credentials.encryptionKey;
+        var encryptionKey = atob(this.credentials.encryptionKey);
         var messagePayload = atob(messagePayloadInput);
 
         var version = messagePayload.substr(0, 1);
