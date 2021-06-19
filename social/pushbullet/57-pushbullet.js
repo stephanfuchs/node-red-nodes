@@ -174,28 +174,20 @@ module.exports = function(RED) {
         var encryptionKey = this.credentials.encryptionKey;
         var messagePayload = atob(messagePayloadInput);
 
-        this.warn('step 1');
         var version = messagePayload.substr(0, 1);
-        this.warn(version);
-        this.warn('step 2');
         var tag = messagePayload.substr(1, 16); // 128 bits
-        this.warn(tag);
-        this.warn('step 3');
         var initialization_vector = messagePayload.substr(17, 12); // 96 bits
-        this.warn(initialization_vector);
-        this.warn('step 4');
         var encrypted_message = messagePayload.substr(29);
-        this.warn(encrypted_message);
 
-        this.warn('after vars');
-        this.warn('version');
-        this.warn(version);
+        // this.warn('after vars');
+        // this.warn('version');
+        // this.warn(version);
 
         if (version != "1") {
             this.error("invalid version");
         }
 
-        this.warn('forge.cipher.createDecipher')
+        // this.warn('forge.cipher.createDecipher')
 
         var decipher = forge.cipher.createDecipher('AES-GCM', encryptionKey);
         decipher.start({
@@ -203,14 +195,14 @@ module.exports = function(RED) {
           'tag': tag
         });
 
-        this.warn('after forge.cipher.createDecipher')
-        this.warn('decipher');
-        this.warn(decipher);
-        // decipher.update(forge.util.createBuffer(encrypted_message));
-        // decipher.finish();
+        // this.warn('after forge.cipher.createDecipher')
+        // this.warn('decipher');
+        // this.warn(decipher);
+        decipher.update(forge.util.createBuffer(messagePayload));
+        decipher.finish();
 
-        // var message = decipher.output.toString('utf8');
-        // return JSON.parse(message);
+        var message = decipher.output.toString('utf8');
+        return JSON.parse(message);
     }
 
     PushbulletConfig.prototype.pushMsg = function(incoming) {
