@@ -97,7 +97,8 @@ module.exports = function(RED) {
     }
 
     // From https://docs.pushbullet.com/#decryption
-    PushbulletConfig.prototype.decryptMessage = function decryptMessage(messagePayloadUtf8Data) {
+    PushbulletConfig.prototype.decryptMessage = function(messagePayloadUtf8Data) {
+      this.status(messagePayloadUtf8Data);
       var self = this;
       var encryptionKey = this.credentials.encryptionKey;
       var messagePayloadJson = JSON.parse(messagePayloadUtf8Data);
