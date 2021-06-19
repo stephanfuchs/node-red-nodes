@@ -97,7 +97,7 @@ module.exports = function(RED) {
         var self = this;
         if (this.pusher) {
             if (this.credentials.encryptionPassword) {
-              this.pusher.enableEncryption(this.credentials.encryptionPassword, 'ujB8nxmW2ZU');
+              this.pusher.enableEncryption(this.credentials.encryptionPassword, this.me.iden);
             }
             var stream = this.pusher.stream();
             stream.setMaxListeners(100);
@@ -170,8 +170,8 @@ module.exports = function(RED) {
     };
 
     PushbulletConfig.prototype.pushMsg = function(incoming) {
-        this.warn('incoming')
-        this.warn(incoming)
+        this.warn('me')
+        this.warn(this.me)
         if (this._inputNodes.length === 0) {
             return;
         }
