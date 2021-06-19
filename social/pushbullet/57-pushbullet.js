@@ -202,8 +202,8 @@ module.exports = function(RED) {
         decipher.finish();
 
         // var message = decipher.output.toString('utf8');
-        // this.warn('decipher');
-        // this.warn(decipher);
+        this.warn('decipher');
+        this.warn(decipher);
         // return JSON.parse(message);
     }
 
